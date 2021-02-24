@@ -64,7 +64,7 @@ let
     )) ++ consensusParams.${cfg.nodeConfig.Protocol} ++ cfg.extraArgs ++ cfg.rtsArgs;
     in ''
         choice() { i=$1; shift; eval "echo \''${$((i + 1))}"; }
-        echo "Starting ${exec}: ${concatStringsSep "\"\n   echo \"" cmd}"
+        echo "Starting: ${concatStringsSep "\"\n   echo \"" cmd}"
         echo "..or, once again, in a single line:"
         echo "${toString cmd}"
         ${lib.optionalString (cfg.environment == "selfnode") ''
