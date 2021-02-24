@@ -50,19 +50,18 @@ let
       ];
     };
     instanceDbPath = "${cfg.databasePath}${optionalString (i > 0) "-${toString i}"}";
-    exec = "cardano-node run";
-        cmd = builtins.filter (x: x != "") [
-          "${cfg.package}/bin/${exec}"
-          "--config ${realNodeConfigFile}"
-          "--database-path ${instanceDbPath}"
-          "--topology ${topology}"
-        ] ++ (lib.optionals (!cfg.systemdSocketActivation) ([
-          "--host-addr ${cfg.hostAddr}"
-          "--port ${toString (cfg.port + i)}"
-          "--socket-path ${cfg.socketPath}"
-        ] ++ lib.optional (cfg.ipv6HostAddr != null)
-          "--host-ipv6-addr ${cfg.ipv6HostAddr}"
-        )) ++ consensusParams.${cfg.nodeConfig.Protocol} ++ cfg.extraArgs ++ cfg.rtsArgs;
+    cmd = builtins.filter (x: x != "") [
+      "${cfg.executable} run"
+      "--config ${realNodeConfigFile}"
+      "--database-path ${instanceDbPath}"
+      "--topology ${topology}"
+    ] ++ (lib.optionals (!cfg.systemdSocketActivation) ([
+      "--host-addr ${cfg.hostAddr}"
+      "--port ${toString (cfg.port + i)}"
+      "--socket-path ${cfg.socketPath}"
+    ] ++ lib.optional (cfg.ipv6HostAddr != null)
+      "--host-ipv6-addr ${cfg.ipv6HostAddr}"
+    )) ++ consensusParams.${cfg.nodeConfig.Protocol} ++ cfg.extraArgs ++ cfg.rtsArgs;
     in ''
         choice() { i=$1; shift; eval "echo \''${$((i + 1))}"; }
         echo "Starting ${exec}: ${concatStringsSep "\"\n   echo \"" cmd}"
@@ -162,6 +161,15 @@ in {
         defaultText = "cardano-node";
         description = ''
           The cardano-node package that should be used
+        '';
+      };
+
+      executable = mkOption {
+        type = types.str;
+        default = "${cfg.package}/bin/cardano-node";
+        defaultText = "cardano-node";
+        description = ''
+          The cardano-node executable invocation to use
         '';
       };
 
