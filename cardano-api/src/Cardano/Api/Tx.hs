@@ -590,21 +590,20 @@ makeShelleyBootstrapWitness _ ByronTxBody{} _ =
 makeShelleyBootstrapWitness nwOrAddr (ShelleyTxBody era txbody _) sk =
     case era of
       ShelleyBasedEraShelley ->
-        makeShelleyBasedBootstrapWitness
-          era nwOrAddr txbody sk
+        makeShelleyBasedBootstrapWitness era nwOrAddr txbody sk
       ShelleyBasedEraAllegra ->
-        makeShelleyBasedBootstrapWitness
-          era nwOrAddr txbody sk
+        makeShelleyBasedBootstrapWitness era nwOrAddr txbody sk
       ShelleyBasedEraMary    ->
-        makeShelleyBasedBootstrapWitness
-          era nwOrAddr txbody sk
+        makeShelleyBasedBootstrapWitness era nwOrAddr txbody sk
 
-makeShelleyBasedBootstrapWitness :: forall era ledgerera.
-                                    Shelley.ShelleyBased ledgerera
-                                 => Ledger.Crypto ledgerera ~ StandardCrypto
+makeShelleyBasedBootstrapWitness :: forall era.
+                                    (Ledger.HashAnnotated
+                                       (Ledger.TxBody (ShelleyLedgerEra era))
+                                       Ledger.EraIndependentTxBody
+                                       StandardCrypto)
                                  => ShelleyBasedEra era
                                  -> WitnessNetworkIdOrByronAddress
-                                 -> Ledger.TxBody ledgerera
+                                 -> Ledger.TxBody (ShelleyLedgerEra era)
                                  -> SigningKey ByronKey
                                  -> Witness era
 makeShelleyBasedBootstrapWitness era nwOrAddr txbody (ByronSigningKey sk) =
